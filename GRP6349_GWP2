@@ -1,0 +1,37 @@
+import datetime
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
+
+def read_data(filename1,filename2,column1, column2):
+    
+    file1= pd.read_csv(filename1+".csv")
+    file2= pd.read_csv(filename2+".csv")
+    
+    file=pd.DataFrame()
+    file["DATE"]=file1["DATE"]
+    file[column1]=file1[filename1]
+    file[column2]=file2[filename2]
+    
+    return file
+
+def plotseries(series, label1,label2):
+    fig, ax = plt.subplots(figsize=(12, 5))
+    sns.lineplot(x=series.columns[0], y=series.columns[1], data=series, label=label1)
+    sns.lineplot(x=series.columns[0], y=series.columns[2], data=series, label=label2);
+
+    xticks = ax.get_xticks()
+    xticklabels = [x.get_text() for x in ax.get_xticklabels()]
+
+    _ = ax.set_xticks(xticks, xticklabels, rotation=90)
+
+#We will examine the relationship between default rate and percentage of household income used as mortgage repayment
+mort=read_data("DRSFRMACBS","MDSP","DEFAULT RATE","PCT INCOME AS REPAYMENT")
+plotseries(mort,"Mortgage Default Rate","% of Income used as Mortgage Repayment")
+
+#Volume of corporate bonds vs inflation
+bonds_inflation=read_data("ROWCBSQ027S","FPCPITOTLZGWLD","VOLUME OF CORPORATE BONDS","INFLATION")
+bonds_inflation["BOND VOLUME IN MILLION"]=bonds_inflation["VOLUME OF CORPORATE BONDS"]/1000000
+bdinf=bonds_inflation.drop("VOLUME OF CORPORATE BONDS",axis=1)
+plotseries(bdinf,"Inflation-%","Volume of Bonds -$Million")
